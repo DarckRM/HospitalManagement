@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.corepower.dao.MealorderDao" >
+    <!--分页查询-->
+    <select id="getMealorderList" parameterType="Mealorder" resultType="Mealorder">
+        SELECT m.id,cid as customerid,nickname,relname,n.mtype as breakfast, o.mtype as lunch,d.mtype as dinner,createtime,m.memo FROM t_customer,t_mealorder as m INNER JOIN t_mealtype as n ON m.breakfast = n.id INNER JOIN t_mealtype as o ON m.lunch = o.id INNER JOIN t_mealtype as d ON m.dinner = d.id
+        <where>
+            t_customer.id = m.cid
+            <if test="nickname!=null and nickname!='' ">
+                and  nickname like  '%${nickname}%'
+            </if>
+            <if test="relname!=null and relname!=''">
+                and  relname like  '%${relname}%'
+            </if>
+            <if test="id!=null and id!=''">
+                and  id like  '%${id}%'
+            </if>
+        </where>
+        ORDER BY  id asc
+        limit #{currentPage},#{pageSize}
+    </select>
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="int">
+        select count(*) from t_mealorder RIGHT JOIN t_customer ON t_customer.id = t_mealorder.cid
+        <where>
+            <if test="nickname!=null and nickname!='' ">
+                and  nickname like  '%${nickname}%'
+            </if>
+            <if test="relname!=null and relname!=''">
+                and  relname like  '%${relname}%'
+            </if>
+            <if test="id!=null and id!=''">
+                and  t_mealorder.id like  '%${id}%'
+            </if>
+        </where>
+    </select>
+</mapper>

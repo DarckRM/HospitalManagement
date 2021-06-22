@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.corepower.dao.CstatusDao" >
+    <!--分页查询-->
+    <select id="getCstatusList" parameterType="Cstatus" resultType="Cstatus">
+        select  t_cstatus.id,t_customer.id as customerid ,relname,nickname,temperature,isfever,isheadache,isweakness,issorethroat,isabdominalpain,createtime,t_cstatus.memo from t_customer right JOIN t_cstatus ON t_customer.id = t_cstatus.customerid
+        <where>
+            <if test="nickname!=null and nickname!='' ">
+                and  nickname like  '%${nickname}%'
+            </if>
+            <if test="relname!=null and relname!=''">
+                and  relname like  '%${relname}%'
+            </if>
+            <if test="customerid!=null and customerid!=''">
+                and  t_cstatus.customerid like  '%${customerid}%'
+            </if>
+        </where>
+        ORDER BY createtime desc,id desc
+        limit #{currentPage},#{pageSize}
+    </select>
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="int">
+        select count(t_cstatus.customerid) from t_cstatus RIGHT JOIN t_customer ON t_customer.id = t_cstatus.customerid
+        <where>
+            <if test="nickname!=null and nickname!='' ">
+                and  nickname like  '%${nickname}%'
+            </if>
+            <if test="relname!=null and relname!=''">
+                and  relname like  '%${relname}%'
+            </if>
+            <if test="customerid!=null and customerid!=''">
+                and  t_cstatus.customerid like  '%${customerid}%'
+            </if>
+        </where>
+    </select>
+</mapper>
