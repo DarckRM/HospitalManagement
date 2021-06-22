@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
+                          http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                          http://www.springframework.org/schema/beans
+                          http://www.springframework.org/schema/beans/spring-beans.xsd
+                          http://www.springframework.org/schema/context
+                          http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                          http://www.springframework.org/schema/tx
+                          http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+    <!-- 整合mybatis-->
+    <!-- 加载外部的jdbc.properites
+        classpath 具体作用:  在src根目录下匹配资源
+     -->
+    <context:property-placeholder location="classpath:jdbc.properties" />
+
+    <!-- 配置数据源（连接池） c3p0、dbcp、druid -->
+    <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+        <!-- 连接池中数据库的驱动 -->
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <!-- 连接池中数据库的链接地址 -->
+        <property name="url" value="${jdbc.url}"></property>
+        <!-- 连接池中数据库的用户名 -->
+        <property name="username" value="${jdbc.username}"></property>
+        <!-- 连接池中数据库的密码 -->
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+    <!-- 管理数据库链接 sqlsession -->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sessionFactoryBean">
+        <!-- 注入连接池 -->
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 加载mybatis核心配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-cfg.xml"></property>
+    </bean>
+
+    <!-- 扫描dao接口、dao的xml -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 注入sqlSession会话 -->
+        <property name="sqlSessionFactoryBeanName" value="sessionFactoryBean"></property>
+        <!-- 指定dao接口、xml的位置 -->
+        <property name="basePackage" value="com.darcklh.dao"></property>
+    </bean>
+
+</beans>
