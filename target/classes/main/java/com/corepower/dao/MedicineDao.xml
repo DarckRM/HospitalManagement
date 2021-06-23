@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.corepower.dao.MedicineDao" >
+
+    <sql id="Base_SQL">
+        mid, inprice, salprice, mname, type, t2.typename, descs, qualitydate, description, producefirm, readme, remark FROM medicine t1
+        LEFT JOIN medicinetype t2 ON t1.type = t2.id
+    </sql>
+
+    <!--分页查询-->
+    <select id="getCustomerList" parameterType="Medicine" resultType="Medicine">
+        select <include refid="Base_SQL"></include>
+        <where>
+            <if test="mname!=null and mname!='' ">
+                and mname like '%${mname}%'
+            </if>
+            <if test="type!=null and type!=''">
+                and type = ${type}
+            </if>
+        </where>
+        limit #{currentPage},#{pageSize}
+    </select>
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="int">
+        select count(mid) from medicine
+        <where>
+            <if test="mname!=null and mname!='' ">
+                and mname like  '%${mname}%'
+            </if>
+            <if test="type!=null and type!=''">
+                and type = ${type}
+            </if>
+        </where>
+    </select>
+    <!--插入数据-->
+    <select id="insertCustomer" resultType="int">
+        INSERT INTO medicine
+        (mid, inprice, salprice, mname, type, descs, qualitydate, description, producefirm, readme, remark)
+        VALUES
+        (#{mid},#{inprice},#{salprice},#{mname},#{type},#{descs},#{qualitydate},#{description},#{producefirm},#{readme},#{remark})
+    </select>
+    <!--修改数据-->
+    <select id="updateCustomer" resultType="int">
+        UPDATE medicine SET
+        mid = #{mid},
+        inprice = #{inprice},
+        salprice = #{salprice},
+        mname = #{mname},
+        type = #{type},
+        descs = #{descs},
+        qualitydate = #{qualitydate},
+        description = #{description},
+        producefirm = #{producefirm},
+        readme = #{readme},
+        remark = #{remark}
+        WHERE mid = #{mid}
+    </select>
+</mapper>

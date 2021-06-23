@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.corepower.dao.RegisterDao" >
+
+    <sql id="Base_SQL">
+        t1.* , t2.name AS departmentName,  t3.dname AS didName FROM register t1
+        LEFT JOIN department t2 ON t1.department = t2.id
+        LEFT JOIN doctor t3 ON t1.did = t3.did
+    </sql>
+
+    <!--分页查询-->
+    <select id="findRegisterList"  parameterType="Register" resultType="Register">
+        select  t1.* ,t3.dname, t2.name AS departmentName,  t3.dname AS didName FROM register t1
+        LEFT JOIN department t2 ON t1.department = t2.id
+        LEFT JOIN doctor t3 ON t1.did = t3.did
+        <where>
+            <if test="name!=null and name!='' ">
+                and t1.name like concat("%", #{name},"%")
+            </if>
+            <if test="department!=null and department!=''">
+                and t1.department = #{department}
+            </if>
+        </where>
+        limit #{currentPage},#{pageSize}
+    </select>
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="int">
+        select  count(rid) FROM register t1
+        LEFT JOIN department t2 ON t1.department = t2.id
+        LEFT JOIN doctor t3 ON t1.did = t3.did
+        <where>
+            <if test="name!=null and name!='' ">
+                and t1.name like concat("%", #{name},"%")
+            </if>
+            <if test="department!=null and department!=''">
+                and t1.department = ${department}
+            </if>
+        </where>
+    </select>
+    <!--插入数据-->
+    <insert id="add" parameterType="Register">
+        INSERT INTO register
+        (rid, name, idCard, siNumber, registerMoney, phone, isPay, sex, age, consultation, department,did,status,registerDate,remark)
+        VALUES
+        (#{rid},#{name},#{idCard},#{siNumber},#{registerMoney},#{phone},#{isPay},#{sex},#{age},#{consultation},#{department},#{did},#{status},#{registerDate},#{remark})
+    </insert>
+    <!--修改数据-->
+    <update id="updateRegister" parameterType="Register">
+        UPDATE register SET
+        name = #{name},
+        idCard = #{idCard},
+        siNumber = #{siNumber},
+        registerMoney = #{registerMoney},
+        phone = #{phone},
+        isPay = #{isPay},
+        sex = #{sex},
+        age = #{age},
+        consultation = #{consultation},
+        department = #{department},
+        did = #{did},
+        status = #{status},
+        registerDate = #{registerDate},
+        remark = #{remark}
+        WHERE rid = #{rid}
+    </update>
+</mapper>

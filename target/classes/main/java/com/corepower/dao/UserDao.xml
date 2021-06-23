@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.corepower.dao.UserDao" >
+
+    <!--分页查询-->
+    <select id="getAdminList" parameterType="User" resultType="User">
+        select * from t_user
+        <where>
+            <if test="username!=null and username!='' ">
+                and  username like  '%${username}%'
+            </if>
+            <if test="relname!=null and relname!=''">
+                and  relname like  '%${relname}%'
+            </if>
+            <if test="id!=null and id!=0">
+                and  id like  '%${id}%'
+            </if>
+        </where>
+        ORDER BY  id asc
+        limit #{currentPage},#{pageSize}
+    </select>
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="Integer">
+        select count(id) from t_user
+        <where>
+            <if test="username!=null and username!='' ">
+                and  username like  '%${username}%'
+            </if>
+            <if test="relname!=null and relname!=''">
+                and  relname like  '%${relname}%'
+            </if>
+            <if test="id!=null and id!=0">
+                and  id like  '%${id}%'
+            </if>
+        </where>
+    </select>
+    <delete id="leteUser" parameterType="Integer" >
+        delete from  t_userrole where userid=#(id)
+        delete from t_user where id=#{id}
+    </delete>
+    <resultMap id="userMap" type="User">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+        <result property="relname"  column="relname"></result>
+        <result property="sex"      column="sex"></result>
+        <result property="email"    column="email"></result>
+        <result property="tel"      column="tel"></result>
+        <result property="isdel"    column="isdel"></result>
+        <result property="memo"     column="memo"></result>
+        <result property="name"   column="name"></result>
+        <collection property="roles" javaType="java.util.List" ofType="Role">
+            <id column="role_id" property="id"></id>
+            <result property="name"         column="name"></result>
+            <result property="description"  column="description"></result>
+            <result property="isdelete"     column="isdelete"></result>
+        </collection>
+    </resultMap>
+    <!--添加管理员信息-->
+    <insert id="addUser" parameterType="User" keyProperty="id" useGeneratedKeys="true">
+        insert into t_user (username,password,relname,sex,email,tel,memo)
+        values(#{username},#{password},#{relname},#{sex},#{email},#{tel},#{memo})
+    </insert>
+    <insert id="saveUserRole" parameterType="User">
+        insert into t_userrole(
+        userid,roleid
+        ) values
+        (${id},#{roleid})
+    </insert>
+    <select id="findUserById" resultMap="userMap">
+   SELECT  u.id,u.username,u.password,u.relname,u.sex,u.email,u.tel,u.memo,r.name,r.description,ra.authority FROM t_user u
+  left outer join t_userrole ur on u.id=ur.userid
+  left outer join t_role r on r.id=ur.roleid
+  left outer join t_roleauthority ra on r.id = ra.roleid
+  where u.id=#{id}
+    </select>
+    <update id="updateUser" parameterType="User">
+        update t_user
+        <set>
+            <if test="username!=null and username !=''">
+                username=#{username},
+            </if>
+            <if test="password !=null and password !=''">
+                password=#{password},
+            </if>
+            <if test="relname !=null and relname !=''">
+                relname=#{relname},
+            </if>
+            <if test="sex !=null and sex !=''">
+                sex=#{sex},
+            </if>
+            <if test="tel !=null and tel !=0">
+                tel=#{tel},
+            </if>
+            <if test="email !=null and email !=''">
+                email=#{email},
+            </if>
+            <if test="memo!=null and memo!=''">
+                memo=#{memo},
+            </if>
+
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateInf" parameterType="User">
+        update t_userrole set roleid=#{roleid} where userid=#{id}
+    </update>
+</mapper>

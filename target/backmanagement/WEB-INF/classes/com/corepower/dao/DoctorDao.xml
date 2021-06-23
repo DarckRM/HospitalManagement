@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.corepower.dao.DoctorDao" >
+
+    <sql id="Base_SQL">
+        did, dname, cardno, phone, sex, age, birthday, department, email, t2.name AS departmentname, education, t3.name AS educated, remark FROM doctor t1
+        LEFT JOIN department t2 ON t1.department = t2.id
+        LEFT JOIN educate t3 ON t1.education = t3.id
+    </sql>
+
+    <!--分页查询-->
+    <select id="getCustomerList" parameterType="Doctor" resultType="Doctor">
+        select <include refid="Base_SQL"></include>
+        <where>
+            <if test="dname!=null and dname!='' ">
+                and dname like '%${dname}%'
+            </if>
+            <if test="department!=null and department!=''">
+                and department = ${department}
+            </if>
+        </where>
+        limit #{currentPage},#{pageSize}
+    </select>
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="int">
+        select count(did) from doctor
+        <where>
+            <if test="dname!=null and dname!='' ">
+                and dname like  '%${dname}%'
+            </if>
+            <if test="department!=null and department!=''">
+                and department = ${department}
+            </if>
+        </where>
+    </select>
+    <!--插入数据-->
+    <select id="insertCustomer" resultType="int">
+        INSERT INTO doctor
+        (did, dname, cardno, phone, sex, age, birthday, department, email, education, remark)
+        VALUES
+        (#{did},#{dname},#{cardno},#{phone},#{sex},#{age},#{birthday},#{department},#{email},#{education},#{remark})
+    </select>
+    <!--修改数据-->
+    <select id="updateCustomer" resultType="int">
+        UPDATE doctor SET
+        dname = #{dname},
+        sex = #{sex},
+        department = #{department},
+        phone = #{phone},
+        email = #{email},
+        education = #{education}
+        WHERE did = #{did}
+    </select>
+</mapper>
